@@ -1,4 +1,4 @@
-import Message from "@/components/message";
+import Message, { MessageProps } from "@/components/message";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { auth, db } from "@/utils/firebase";
@@ -6,18 +6,23 @@ import { toast } from "react-toastify";
 import {
   arrayUnion,
   doc,
-  documentId,
-  getDoc,
   onSnapshot,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
 
+interface Comment {
+  avatar: string;
+  message: string;
+  time: string;
+  username: string;
+}
+
 export default function Details() {
   const router = useRouter();
   const routeData = router.query;
   const [message, setMessage] = useState("");
-  const [allMessages, setAllMessages] = useState([]);
+  const [allComments, setAllComments] = useState([]);
 
   //Submit a message
   const submitMessage = async () => {
@@ -30,7 +35,7 @@ export default function Details() {
       });
       return;
     }
-    const docRef = doc(db, "posts", routeData.id);
+    const docRef = doc(db, "posts", routeData.id as string);
     await updateDoc(docRef, {
       comments: arrayUnion({
         message,
@@ -44,9 +49,12 @@ export default function Details() {
 
   //Get Comments
   const getComments = async () => {
-    const docRef = doc(db, "posts", routeData.id);
+    const docRef = doc(db, "posts", routeData.id as string);
     const unsubscribe = onSnapshot(docRef, (snapshot) => {
-      setAllMessages(snapshot.data().comments);
+      const data = snapshot.data();
+      if (data) {
+        setAllComments(data.comments);
+      }
     });
     return unsubscribe;
   };
@@ -77,13 +85,13 @@ export default function Details() {
         </div>
         <div className="py-6">
           <h2 className="font-bold">Comments</h2>
-          {allMessages?.map((message) => (
-            <div className="bg-white p-4 my-4 border-2" key={message.time}>
+          {allComments?.map((comment: Comment) => (
+            <div className="bg-white p-4 my-4 border-2" key={comment.time}>
               <div className="flex items-center gap-2 mb-4">
-                <img className="w-10 rounded-full" src={message.avatar} />
-                <h2>{message.username}</h2>
+                <img className="w-10 rounded-full" src={comment.avatar} />
+                <h2>{comment.username}</h2>
               </div>
-              <h2>{message.message}</h2>
+              <h2>{comment.message}</h2>
             </div>
           ))}
         </div>

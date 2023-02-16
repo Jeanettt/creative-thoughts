@@ -8,9 +8,16 @@ import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
+interface Post {
+  comments?: string[];
+  description?: string;
+  id?: string;
+  timestamp?: string;
+}
+
 export default function Home() {
   //Create a state with all the posts
-  const [allPosts, setAllPosts] = useState([]);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
 
   const getPosts = async () => {
     const collectionRef = collection(db, "posts");
@@ -40,7 +47,10 @@ export default function Home() {
           <Message key={post.id} {...post}>
             <Link href={{ pathname: `${post.id}`, query: { ...post } }}>
               <button>
-                {post.comments?.length > 0 ? post.comments?.length : 0} comments
+                {post.comments && post.comments.length > 0
+                  ? post.comments.length
+                  : 0}{" "}
+                comments
               </button>
             </Link>
           </Message>

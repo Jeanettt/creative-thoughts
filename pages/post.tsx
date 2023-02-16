@@ -1,13 +1,30 @@
-import { auth, db } from '@/utils/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { toast } from 'react-toastify';
+import { auth, db } from "@/utils/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import { toast } from "react-toastify";
 
-export default function Post(){
+export interface NewPost {
+  description: string;
+  id?: string;
+}
+interface Post {
+  comments?: string[];
+  description: string;
+  id: string;
+  timestamp: string;
+}
+
+export default function Post() {
   //Form state
-  const [post, setPost] = useState({ description: "" });
+  const [post, setPost] = useState<Post | NewPost>({ description: "" });
   const [user, loading] = useAuthState(auth);
   const route = useRouter();
   const routeData = route.query;
@@ -16,29 +33,29 @@ export default function Post(){
     e.preventDefault();
 
     //Run checks for description
-    if(!post.description){
-      toast.error('Description Field empty 😅', {
+    if (!post.description) {
+      toast.error("Description Field empty 😅", {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 1500
-      })
+        autoClose: 1500,
+      });
       return;
     }
-    if(post.description.length > 300){
-      toast.error('Description too long 😅', {
+    if (post.description.length > 300) {
+      toast.error("Description too long 😅", {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 1500
-      })
+        autoClose: 1500,
+      });
       return;
     }
 
-    if(post?.hasOwnProperty("id")){
-      const docRef = doc(db, 'posts', post.id);
-      const updatedPost = {...post, timestamp: serverTimestamp()}
+    if (post.id) {
+      const docRef = doc(db, "posts", post.id);
+      const updatedPost = { ...post, timestamp: serverTimestamp() };
       await updateDoc(docRef, updatedPost);
-      return route.push('/')
+      return route.push("/");
     } else {
       //Make a new post
-      const collectionRef = collection(db, 'posts');
+      const collectionRef = collection(db, "posts");
       await addDoc(collectionRef, {
         ...post,
         timestamp: serverTimestamp(),
@@ -46,42 +63,57 @@ export default function Post(){
         avatar: user?.photoURL,
         username: user?.displayName,
       });
-      setPost({description: ''});
-      toast.success('Post has been made 🚀', {position: toast.POSITION.TOP_CENTER, autoClose: 1500})
-      return route.push('/')
+      setPost({ description: "" });
+      toast.success("Post has been made 🚀", {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 1500,
+      });
+      return route.push("/");
     }
-  }
+  };
 
   //Check our user
   const checkUser = async () => {
-    if(loading) return;
-    if(!user) route.push("/auth/login");
-    if(routeData.id) {
-      setPost({description: routeData.description, id: routeData.id})
+    if (loading) return;
+    if (!user) route.push("/auth/login");
+    if (routeData.id && routeData.description) {
+      setPost({
+        description: routeData.description as string,
+        id: routeData.id as string,
+      });
     }
-  }
+  };
 
   useEffect(() => {
     checkUser();
   }, [user, loading]);
 
-  return(
-    <div className='my-20 p-12 shadow-lg rounded-lg max-w-md'>
+  return (
+    <div className="my-20 p-12 shadow-lg rounded-lg max-w-md">
       <form onSubmit={submitPost}>
-        <h1 className='text-2xl font-bold'>
-          {post.hasOwnProperty('id') ? 'Edit your post' : 'Create a new post'}
+        <h1 className="text-2xl font-bold">
+          {post.hasOwnProperty("id") ? "Edit your post" : "Create a new post"}
         </h1>
-        <div className='py-2'>
-          <h3 className='text-lg py-2'>Description</h3>
+        <div className="py-2">
+          <h3 className="text-lg py-2">Description</h3>
           <textarea
             value={post.description}
-            onChange={(e) => setPost({ ...post, description: e.target.value})}
-            className='bg-gray-800 h-48 w-full text-white rounded-lg p-2 text-sm'
+            onChange={(e) => setPost({ ...post, description: e.target.value })}
+            className="bg-gray-800 h-48 w-full text-white rounded-lg p-2 text-sm"
           ></textarea>
-          <p className={`text-cyan-600 font-semibold text-sm ${post.description.length > 300 ? 'text-red-600' : ''}`}>{post.description.length}/300</p>
+          <p
+            className={`text-cyan-600 font-semibold text-sm ${
+              post.description.length > 300 ? "text-red-600" : ""
+            }`}
+          >
+            {post.description.length}/300
+          </p>
           <button
-            type='submit'
-            className='w-full bg-cyan-600 text-white font-medium p-2 my-2 rounded-lg text-sm'>Submit</button>
+            type="submit"
+            className="w-full bg-cyan-600 text-white font-medium p-2 my-2 rounded-lg text-sm"
+          >
+            Submit
+          </button>
         </div>
       </form>
     </div>
