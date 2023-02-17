@@ -4,7 +4,7 @@ For this personal project I have created a modern full stack React application w
 
 ## View final result
 
-To see the full app I created visit https://creative-thoughts-gpfvjayc6-jeanettt.vercel.app/.
+To see the full app I created visit https://creative-thoughts-jeanettt.vercel.app/.
 
 ## Run project locally
 
