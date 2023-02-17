@@ -56,37 +56,45 @@ export default function Dashboard() {
   }, [user, loading]);
 
   return (
-    <div>
-      <h1>Your posts</h1>
+    <div className="my-12 md:flex justify-between">
       <div>
-        {posts.map((post: Post) => {
-          return (
-            <Message key={post.id} {...post}>
-              <div className="flex gap-4">
-                <button
-                  onClick={(e) => deletePost(post.id)}
-                  className="text-pink-600 flex items-center gap-2 py-2 text-sm"
-                >
-                  <BsTrash2Fill className="text-2xl" />
-                  Delete
-                </button>
-                <Link href={{ pathname: "/post", query: JSON.stringify(post) }}>
-                  <button className="text-teal-600 flex items-center gap-2 py-2 text-sm">
-                    <AiFillEdit className="text-2xl" />
-                    Edit
+        <h2 className="text-5xl mb-4 font-forum text-gray-700">Your posts</h2>
+        <div>
+          {posts.map((post: Post) => {
+            return (
+              <Message key={post.id} {...post}>
+                <div className="flex gap-4">
+                  <button
+                    onClick={(e) => deletePost(post.id)}
+                    className="text-secondary-tint font-semibold flex items-center gap-0.5 py-2 text-xs"
+                  >
+                    <BsTrash2Fill className="text-base" />
+                    <span className="underline">Delete</span>
                   </button>
-                </Link>
-              </div>
-            </Message>
-          );
-        })}
+                  {/* @ts-ignore */}
+                  <Link href={{ pathname: "/post", query: post }}>
+                    <button className="text-primary font-semibold flex items-center gap-0.5 py-2 text-xs">
+                      <AiFillEdit className="text-base" />
+                      <span className="underline">Edit</span>
+                    </button>
+                  </Link>
+                </div>
+              </Message>
+            );
+          })}
+        </div>
       </div>
-      <button
-        className="font-semibold text-white bg-gray-800 py-2 px-4 my-6 rounded-lg"
-        onClick={() => auth.signOut()}
-      >
-        Sign out
-      </button>
+      <div>
+        <h2 className="text-2xl mt-12 md:mt-4 font-semibold text-gray-700">
+          Account info
+        </h2>
+        <button
+          className="mt-4 font-semibold text-secondary underline"
+          onClick={() => auth.signOut()}
+        >
+          Sign out
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,11 @@
-import { FcGoogle } from 'react-icons/fc';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '@/utils/firebase';
-import { useRouter } from 'next/router';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useEffect  } from 'react';
+import { FcGoogle } from "react-icons/fc";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "@/utils/firebase";
+import { useRouter } from "next/router";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useEffect } from "react";
 
-export default function Login(){
+export default function Login() {
   const route = useRouter();
   const [user, loading] = useAuthState(auth);
   //Sign in with Google
@@ -20,23 +20,24 @@ export default function Login(){
   };
 
   useEffect(() => {
-    if(user){
+    if (user) {
       route.push("/");
     } else {
-      console.log("login")
+      console.log("login");
     }
   }, [user]);
 
-  return(
-    <div className="shadow-xl mt-16 p-10 text-gray-700 rounded-lg">
-      <h2 className="text-2xl font-semibold">Join Today</h2>
-      <div className="py-4">
-        <h3 className="py-4">Sign in with one of the providers</h3>
-        <button onClick={GoogleLogin} className="text-white bg-gray-700 w-full font-medium rounded-lg flex align-middle p-4 gap-2">
-          <FcGoogle className='text-2xl' />
-          Sign in with Google
-        </button>
-      </div>
+  return (
+    <div className="my-12 p-10 flex flex-col items-center">
+      <h2 className="text-5xl font-forum text-gray-700">Join Today</h2>
+      <p className="mt-8">Sign in with one of the providers</p>
+      <button
+        onClick={GoogleLogin}
+        className="mt-4 text-white font-semibold bg-secondary rounded-sm flex align-middle p-4 gap-2"
+      >
+        <FcGoogle className="text-2xl" />
+        Sign in with Google
+      </button>
     </div>
-  )
-} 
+  );
+}

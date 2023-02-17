@@ -11,23 +11,20 @@ import {
 } from "firebase/firestore";
 import { toast } from "react-toastify";
 
-export interface NewPost {
-  description: string;
-  id?: string;
-}
 interface Post {
   comments?: string[];
-  description: string;
-  id: string;
-  timestamp: string;
+  description?: string;
+  id?: string;
+  timestamp?: string;
 }
 
 export default function Post() {
   //Form state
-  const [post, setPost] = useState<Post | NewPost>({ description: "" });
+  const [post, setPost] = useState<Post>({ description: "" });
   const [user, loading] = useAuthState(auth);
   const route = useRouter();
   const routeData = route.query;
+  console.log(routeData);
   //Submite post
   const submitPost = async (e: any) => {
     e.preventDefault();
@@ -48,7 +45,7 @@ export default function Post() {
       return;
     }
 
-    if (post.id) {
+    if (post.hasOwnProperty("id") && post.id) {
       const docRef = doc(db, "posts", post.id);
       const updatedPost = { ...post, timestamp: serverTimestamp() };
       await updateDoc(docRef, updatedPost);
@@ -89,28 +86,32 @@ export default function Post() {
   }, [user, loading]);
 
   return (
-    <div className="my-20 p-12 shadow-lg rounded-lg max-w-md">
+    <div className="my-12 max-w-md">
       <form onSubmit={submitPost}>
-        <h1 className="text-2xl font-bold">
+        <h2 className="text-5xl mb-4 font-forum text-gray-700">
           {post.hasOwnProperty("id") ? "Edit your post" : "Create a new post"}
-        </h1>
-        <div className="py-2">
-          <h3 className="text-lg py-2">Description</h3>
+        </h2>
+        <div className="mt-8">
           <textarea
             value={post.description}
             onChange={(e) => setPost({ ...post, description: e.target.value })}
-            className="bg-gray-800 h-48 w-full text-white rounded-lg p-2 text-sm"
+            className="w-full border border-primary-tint rounded-lg p-2 text-sm h-48"
           ></textarea>
           <p
-            className={`text-cyan-600 font-semibold text-sm ${
-              post.description.length > 300 ? "text-red-600" : ""
+            className={`text-slate-500 text-sm ${
+              post.description && post.description.length > 300
+                ? "text-red-600"
+                : ""
             }`}
           >
-            {post.description.length}/300
+            {post.description && post.description.length
+              ? post.description.length
+              : 0}
+            /300
           </p>
           <button
             type="submit"
-            className="w-full bg-cyan-600 text-white font-medium p-2 my-2 rounded-lg text-sm"
+            className="w-full bg-primary text-white font-medium p-2 my-2 rounded-sm text-sm"
           >
             Submit
           </button>
